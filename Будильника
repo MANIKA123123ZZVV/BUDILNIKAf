@@ -1,0 +1,258 @@
+#include <LiquidCrystal.h>
+#define DIODE_DROP 0.7
+LiquidCrystal lcd(7, 6, 5, 4, 3, 2); //Установка библиотеки LCD; диод, защищающий от неверной полярности; пины для управлением дисплеем
+int CHAS1 = 0; //Десятки часа
+int CHAS2 = 0; //Единицы часа
+int MINUTE1 = 0; //Десятки минут
+int MINUTE2 = 0; //Единицы минут
+int SEKOND1 = 0; //Десятки секунд
+int SEKOND2 = 0; //Единицы секунд
+#define BAZER 10 //- час
+#define BAZZER 11 //+ час
+#define BAZZZER 13 //+ минута
+#define BAZZZZER 12 //- минута
+#define BUDILNIK 8
+#define PISK 9 //Пьезопищалка
+
+boolean BUDILNIK2 = true; //"Кнопка была отпущена"
+boolean NAZHATA1 = true;
+boolean NAZHATA2 = true;
+boolean NAZHATA3 = true;
+boolean NAZHATA4 = true;
+
+void setup(){
+  lcd.begin(16, 2); //Указываем размеры дисплея (клеток в строке, строк)
+
+  pinMode(BUDILNIK, INPUT_PULLUP); //Кнопки на выход
+  pinMode(BAZZER, INPUT_PULLUP);
+  pinMode(BAZZZER, INPUT_PULLUP);
+  pinMode(BAZER, INPUT_PULLUP);
+  pinMode(BAZZZZER, INPUT_PULLUP);
+  pinMode(PISK, OUTPUT); //Пищалку на вход
+}
+void loop() {
+    int i = 0; //Чтобы повторялась
+  while (i<1){
+  boolean NENAZHATA1 = digitalRead(BAZZER); //"Кнопка отпущена сейчас"
+  boolean NENAZHATA2 = digitalRead(BAZZZER);
+  boolean NENAZHATA3 = digitalRead(BAZER);
+  boolean NENAZHATA4 = digitalRead(BAZZZZER);
+  boolean BUDILNIK1 = digitalRead(BUDILNIK);
+  if(BUDILNIK2 && !BUDILNIK1){ //Если мы хотим будильник
+    int i = 0;
+    while(i<1){
+    lcd.setCursor(4, 1); //Предупреждаем, что будильник включен
+    lcd.print("Budilnik");
+    int i = 0;
+    while(i<86400){ //86400 сек. = 1 дню
+  boolean NENAZHATA1 = digitalRead(BAZZER);
+  boolean NENAZHATA2 = digitalRead(BAZZZER);
+  boolean NENAZHATA3 = digitalRead(BAZER);
+  boolean NENAZHATA4 = digitalRead(BAZZZZER);
+  boolean BUDILNIK1 = digitalRead(BUDILNIK);
+    if (NAZHATA3 && !NENAZHATA3){ //Настройки: - час
+      SEKOND1 = 0;
+      SEKOND2 = 0;
+      CHAS2--;
+      if(CHAS2 == -1){ //Если отнимим от нуля
+        CHAS2 = 9;
+        CHAS1--;
+        if(CHAS1 == -1){ //Если в десятках часов будет нуль
+          CHAS1 = 2;
+          CHAS2 = 3;
+        }
+    }
+    }
+    if (NAZHATA4 && !NENAZHATA4){ //Настройки: - минута
+      SEKOND1 = 0;
+      SEKOND2 = 0;
+      MINUTE2--;
+      if(MINUTE2 == -1){
+        MINUTE2 = 9;
+        MINUTE1--;
+        if(MINUTE1 == -1){ //Если в десятках минут будет нуль
+          MINUTE1 = 5;
+          MINUTE2 = 9;
+        }
+  }
+    }
+    if (NAZHATA1 && !NENAZHATA1){ //Настройки: + час
+      SEKOND1 = 0;
+      SEKOND2 = 0;
+      CHAS2++;
+      if(CHAS2 == 10){ //Если единицы будут равны десяти
+        CHAS2 = 0;
+        CHAS1++;
+    }
+    }
+    if (NAZHATA2 && !NENAZHATA2){ //Настройки: + минута
+      SEKOND1 = 0;
+      SEKOND2 = 0;
+      MINUTE2++;
+      if(MINUTE2 == 10){
+        MINUTE2 = 0;
+        MINUTE1++;
+  }
+    }
+ 
+  lcd.setCursor(4, 0); //Распологаем всё в дисплее
+  lcd.print(CHAS1);
+  lcd.setCursor(5, 0);
+  lcd.print(CHAS2);
+  lcd.setCursor(6, 0);
+  lcd.print(":");
+  lcd.setCursor(7, 0);
+  lcd.print(MINUTE1);
+  lcd.setCursor(8, 0);
+  lcd.print(MINUTE2);
+  lcd.setCursor(9, 0);
+  lcd.print(":");
+  lcd.setCursor(10, 0);
+  lcd.print(SEKOND1);
+  lcd.setCursor(11, 0);
+  lcd.print(SEKOND2);
+  delay(1000); //Ждем секунду
+  lcd.setCursor(10, 0);
+  lcd.print(SEKOND1);
+  lcd.setCursor(11, 0);
+  lcd.print(SEKOND2++); //Секунда прибавляется
+  if(SEKOND2 == 10){
+    SEKOND2 = 0;
+    SEKOND1++;
+  }
+    if(SEKOND1 == 6){ //Если в десятках секунд (минут) будет шесть
+    SEKOND1 = 0;
+    MINUTE2++;
+  }
+  if(MINUTE2 == 10){
+    MINUTE2 = 0;
+    MINUTE1++;
+  }
+    if(MINUTE1 == 6){
+    MINUTE1 = 0;
+    CHAS2++;
+  }
+  if(CHAS1 == 2){
+    if(CHAS2 == 4){ //Если часы будут равны одному дню
+      CHAS1 = 0;
+      CHAS2 = 0; //То будет начинаться новый день
+      }
+  }
+  if(CHAS2 == 10){
+    CHAS2 = 0;
+    CHAS1++;        
+  }
+      if(SEKOND2 == 10){
+        SEKOND2 = 0;
+        SEKOND1++;
+  }
+    if(SEKOND1 == 6){
+    SEKOND1 = 0;
+    MINUTE2++;
+  }
+  i++;
+    }
+    tone(PISK, 2000); //Сам будильник
+    delay(1000);
+    noTone(PISK);
+    SEKOND2++; //Из-за того что во время писка время останавливается, прибавляем одну секнду
+      if(SEKOND2 == 10){
+        SEKOND2 = 0;
+        SEKOND1++;
+  }
+  }
+  }
+    if (NAZHATA3 && !NENAZHATA3){ //Если мы не хотим пока будильник
+      SEKOND1 = 0;
+      SEKOND2 = 0;
+      CHAS2--;
+      if(CHAS2 == -1){
+        CHAS2 = 9;
+        CHAS1--;
+        if(CHAS1 == -1){
+          CHAS1 = 2;
+          CHAS2 = 3;
+        }
+    }
+    }
+    if (NAZHATA4 && !NENAZHATA4){
+      SEKOND1 = 0;
+      SEKOND2 = 0;
+      MINUTE2--;
+      if(MINUTE2 == -1){
+        MINUTE2 = 9;
+        MINUTE1--;
+        if(MINUTE1 == -1){
+          MINUTE1 = 5;
+          MINUTE2 = 9;
+        }
+  }
+    }
+    if (NAZHATA1 && !NENAZHATA1){
+      SEKOND1 = 0;
+      SEKOND2 = 0;
+      CHAS2++;
+      if(CHAS2 == 10){
+        CHAS2 = 0;
+        CHAS1++;
+    }
+    }
+    if (NAZHATA2 && !NENAZHATA2){
+      SEKOND1 = 0;
+      SEKOND2 = 0;
+      MINUTE2++;
+      if(MINUTE2 == 10){
+        MINUTE2 = 0;
+        MINUTE1++;
+  }
+    }
+ 
+  lcd.setCursor(4, 0);
+  lcd.print(CHAS1);
+  lcd.setCursor(5, 0);
+  lcd.print(CHAS2);
+  lcd.setCursor(6, 0);
+  lcd.print(":");
+  lcd.setCursor(7, 0);
+  lcd.print(MINUTE1);
+  lcd.setCursor(8, 0);
+  lcd.print(MINUTE2);
+  lcd.setCursor(9, 0);
+  lcd.print(":");
+  lcd.setCursor(10, 0);
+  lcd.print(SEKOND1);
+  lcd.setCursor(11, 0);
+  lcd.print(SEKOND2);
+  delay(1000);
+  lcd.setCursor(10, 0);
+  lcd.print(SEKOND1);
+  lcd.setCursor(11, 0);
+  lcd.print(SEKOND2++);
+  if(SEKOND2 == 10){
+    SEKOND2 = 0;
+    SEKOND1++;
+  }
+    if(SEKOND1 == 6){
+    SEKOND1 = 0;
+    MINUTE2++;
+  }
+  if(MINUTE2 == 10){
+    MINUTE2 = 0;
+    MINUTE1++;
+  }
+    if(MINUTE1 == 6){
+    MINUTE1 = 0;
+    CHAS2++;
+  }
+  if(CHAS1 == 2){
+    if(CHAS2 == 4){
+      CHAS1 = 0;
+      CHAS2 = 0;
+      }
+  }
+  if(CHAS2 == 10){
+    CHAS2 = 0;
+    CHAS1++;        
+  }
+  }
+}
